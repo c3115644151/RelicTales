@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **模组名**: RelicTales（考古物语）
 - **Mod ID**: `relictales`
 - **MC 版本**: 26.1.1（对应 Minecraft 原版最新年份制版本）
-- **Mod Loader**: NeoForge 26.1.1.6-beta
+- **Mod Loader**: NeoForge 26.1.1.14-beta
 - **Java**: 25（MDK 内置 Foojay resolver 自动下载，无需手动配置 JAVA_HOME）
 - **构建工具**: Gradle（通过 `gradlew` wrapper，无需预先安装 Gradle）
 
@@ -153,3 +153,40 @@ public RelicTales(IEventBus bus) {
 - 所有网络包需标记 `@Networked` 并在 `RelicPacketHandler` 注册
 - CurseManager 使用 Player Capability 存储诅咒值，跨维度持久化
 - Boss AI 使用 goals + sensors 标准 NeoForge AI 系统
+
+## NeoForge 工具生态
+
+### NeoForge 官方组织工具（neoforged/）
+
+| 仓库 | 用途 |
+|------|------|
+| `AccessTransformers` | 字节码访问修饰符转换器（可添加到 `build.gradle` accessTransformers） |
+| `Bus` | 事件总线框架（NeoForge 事件系统基于此） |
+| `GradleUtils` | Gradle 构建工具库 |
+| `NeoGradle` | 新一代 Kotlin DSL 构建插件 |
+| `CoreMods` | JavaScript 字节码转换系统 |
+| `actions-modming` | GitHub Actions CI/CD 工具集 |
+
+### 推荐第三方依赖库
+
+| 库 | Maven 坐标 | 用途 |
+|----|-----------|------|
+| **Curios API** | `top.theillusivec4.curios:curios-neoforge` |饰品槽位 API（用于遗物佩戴系统）|
+| **Jade** | `maven.modrinth:jade-324717` | 开发期调试工具（显示方块/实体信息） |
+| **EMI** | `dev.emi:emi-neoforge` | 合成路线查看器（JEI 替代品） |
+| **Cloth Config** | `me.shedaniel.cloth:cloth-config-neoforge` | 配置界面 UI 库 |
+
+### 不需要的技术
+
+- **Architectury API**：仅在同时需要 Fabric + NeoForge 双平台时才需要
+- **Registrate**：NeoForge 内置 DeferredRegister 已足够，无需额外注册库
+
+### Maven 仓库配置
+
+```groovy
+repositories {
+    maven { url = 'https://maven.neoforged.net/releases' }  // NeoForge
+    maven { url = 'https://maven.modrinth.org' }            // Modrinth 库
+    maven { url = 'https://maven.architectury.dev/' }       // 第三方库（如需）
+}
+```
