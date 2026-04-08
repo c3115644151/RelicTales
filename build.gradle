@@ -143,10 +143,13 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
             minecraft_version      : minecraft_version,
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
+            loader_version_range   : "[${neo_version}]",
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
             mod_version            : mod_version,
+            mod_authors            : project.findProperty('mod_authors') ?: 'RelicTales Team',
+            mod_description        : project.findProperty('mod_description') ?: 'A Vanilla+ archaeology mod',
     ]
     inputs.properties replaceProperties
     expand replaceProperties

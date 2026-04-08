@@ -1,5 +1,6 @@
 package com.relictales;
 
+import com.relictales.registry.RelicRegisters;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
@@ -8,6 +9,6 @@ public class RelicTales {
     public static final String MOD_ID = "relictales";
 
     public RelicTales(IEventBus modEventBus) {
-        // Registry events will be registered here
+        RelicRegisters.init(modEventBus);
     }
 }
