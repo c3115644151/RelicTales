@@ -176,11 +176,6 @@ public RelicTales(IEventBus bus) {
 | **EMI** | `dev.emi:emi-neoforge` | 合成路线查看器（JEI 替代品） |
 | **Cloth Config** | `me.shedaniel.cloth:cloth-config-neoforge` | 配置界面 UI 库 |
 
-### 不需要的技术
-
-- **Architectury API**：仅在同时需要 Fabric + NeoForge 双平台时才需要
-- **Registrate**：NeoForge 内置 DeferredRegister 已足够，无需额外注册库
-
 ### Maven 仓库配置
 
 ```groovy
@@ -190,3 +185,109 @@ repositories {
     maven { url = 'https://maven.architectury.dev/' }       // 第三方库（如需）
 }
 ```
+
+## 跨平台架构（未来迁移规划）
+
+### 分层原则：四层架构
+
+代码严格按职责分为四层，**从下到上依赖，不能反向**：
+
+```
+┌─────────────────────────────────────────────┐
+│  表现层（client/）                          │  ← 客户端渲染器、音效、GUI
+│  仅在特定 Loader（如 NeoForge/Fabric）存在   │
+├─────────────────────────────────────────────┤
+│  业务逻辑层（content/）                     │  ★ 核心玩法，所有 Loader 共用
+│  纯 Java，不引用任何 Loader 专属 API         │
+├─────────────────────────────────────────────┤
+│  注册层（registry/）                       │  ★ DeferredRegister 等 Loader 专属
+│  负责将 content 层的逻辑注册到游戏中        │
+├─────────────────────────────────────────────┤
+│  数据驱动层（data/ + resources/）           │  ★ JSON，天然跨版本
+│  LootTable、Tag、Lang、ItemModel JSON       │
+└─────────────────────────────────────────────┘
+```
+
+### 业务逻辑层编写规范（content/）
+
+这是**最容易在未来迁移时复用的代码**，编写时严格遵守：
+
+```java
+// ✓ 正确：纯 Java 逻辑，无 Loader 依赖
+public enum ChiselTier {
+    COPPER(1), IRON(2), NETHERITE(3);
+
+    public final int hardness;
+    ChiselTier(int hardness) { this.hardness = hardness; }
+
+    public boolean canBreak(Block block) {
+        return block.getHardness() <= this.hardness * 2;
+    }
+}
+
+// ✗ 错误：在 content 层使用 NeoForge 专属 API
+// public class CurseManager extends NeoForgeHooks { ... }
+```
+
+**以下逻辑必须写在 content/ 层（纯 Java）**：
+- 枚举定义（ChiselTier、CurseLevel、RelicRarity）
+- 算法和判定逻辑（canBreak 判断、稀有度过滤概率）
+- 数据模型（RelicData NBT 结构）
+- 状态机（boss AI 状态转换逻辑）
+
+**以下逻辑写在 registry/ 层（Loader 专属）**：
+- `DeferredRegister` 创建和注册调用
+- 事件监听器注册到 `IEventBus`
+- Capability 注册
+
+### 数据驱动原则（跨版本关键）
+
+**数据包（JSON）天然跨版本兼容**，尽量把逻辑往这里放：
+
+| 数据类型 | 路径 | 跨版本兼容性 |
+|---------|------|------------|
+| LootTable | `data/relictales/loot_tables/` | ★★★★★ |
+| Tags | `data/c/tags/` | ★★★★★ |
+| ItemModel | `assets/relictales/models/item/` | ★★★★☆ |
+| BlockState | `assets/relictales/blockstates/` | ★★★★☆ |
+| Lang | `assets/relictales/lang/` | ★★★★☆ |
+| Recipes | DataGenerator 自动生成 | ★★★★★ |
+
+### 未来迁移路径
+
+```
+当前阶段（NeoForge 26.1.1）
+    │
+    ▼  引入 MultiLoader-Template 时
+    │  将 com.relictales/ 拆分为 common/ + neoforge/ + fabric/
+    │
+    ▼  Fabric 移植
+    │  common/ 逻辑直接复用
+    │  neoforge/ → fabric/ 编写胶水层
+    │
+    ▼  向下版本兼容
+    │  主要工作量在 registry/ 层适配
+    │  content/ 纯 Java 逻辑极少改动
+    │  data/ JSON 层几乎不改
+```
+
+### 第三方 Mod 兼容性策略
+
+通过 **`optional compileOnly`** 声明可选依赖：
+
+```groovy
+// JEI 兼容（行业标准，几乎所有整合包都带）
+compileOnly("mezz.jei:jei-$minecraft_version-neoforge-api:$jei_version")
+runtimeOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
+
+// EMI 兼容（JEI 替代品）
+compileOnly("dev.emi:emi-neoforge:$emi_version")
+
+// Curios API（核心依赖，必须）
+implementation("top.theillusivec4.curios:curios-neoforge:$curios_version+$minecraft_version")
+```
+
+### 不需要的技术
+
+- **Architectury API**：仅在同时需要 Fabric + NeoForge 双平台时才需要
+- **Registrate**：NeoForge 内置 DeferredRegister 已足够，无需额外注册库
