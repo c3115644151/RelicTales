@@ -8,6 +8,11 @@
 # Review your options at https://choosealicense.com/. All rights reserved is the default copyright stance, and is thus the default here.
 license="${mod_license}"
 
+# The mod loader to use to load the mod. The default is javafml
+modLoader="javafml" #mandatory
+# A version range to match the mod loader version
+loaderVersion="[3,)" #mandatory
+
 # A URL to refer people to when problems occur with this mod
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/" #optional
 
@@ -43,9 +48,9 @@ description='''
 Example mod description.
 '''
 
-# The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.
-#[[mixins]]
-#config="${mod_id}.mixins.json"
+# Mixin config is loaded by NeoForge's mod system from the classes directory.
+[[mixins]]
+config="${mod_id}.mixins.json"
 
 # The [[accessTransformers]] block allows you to declare where your AT file is.
 # If this block is omitted, a fallback attempt will be made to load an AT from META-INF/accesstransformer.cfg

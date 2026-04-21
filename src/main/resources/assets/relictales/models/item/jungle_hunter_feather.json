@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "relictales:item/jungle_hunter_feather"
+  }
+}

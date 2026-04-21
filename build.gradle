@@ -26,6 +26,25 @@ sourceSets.main.resources {
     exclude("src/generated/**/.cache") // datagen cache files
 }
 
+// Copy mixin config into the classes output dir so InDevFolderLocator's FolderJarContents can find it.
+// MIXIN JSON MUST be at the ROOT of the source set, NOT in META-INF/, due to a FolderJarContents
+// path resolution issue on Windows where subdirectory paths fail to read.
+tasks.register('copyMixinConfigToClasses', Copy) {
+    from 'src/main/resources'
+    into "${sourceSets.main.output.classesDirs.first()}"
+    include '*.mixins.json'
+}
+// compileJava must run first so the classes/ dir exists before we copy into it
+compileJava.dependsOn copyMixinConfigToClasses
+
+// Ensure mixin config is copied before every run and before building the jar.
+// runClient is created by the neoForge plugin, so we configure it after plugin evaluation.
+afterEvaluate {
+    tasks.named('runClient') { it.dependsOn copyMixinConfigToClasses }
+    tasks.named('runServer') { it.dependsOn copyMixinConfigToClasses }
+    tasks.named('jar') { it.dependsOn copyMixinConfigToClasses }
+}
+
 repositories {
     // Add here additional repositories if required by some of the dependencies below.
 }
@@ -113,6 +132,9 @@ configurations {
 }
 
 dependencies {
+    // Mixin annotation processor (generates refmap for client-side Mixin compatibility)
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
@@ -178,6 +200,11 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+// Handle duplicate META-INF entries (mixin JSON in both classes and resources)
+tasks.named('jar') {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
