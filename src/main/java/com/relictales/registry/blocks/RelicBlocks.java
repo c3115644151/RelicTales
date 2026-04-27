@@ -95,6 +95,23 @@ public class RelicBlocks {
     public static DeferredItem<BlockItem> SUSPICIOUS_CRACKED_STONE_BRICKS_ITEM;
     public static DeferredItem<BlockItem> SUSPICIOUS_MOSSY_STONE_BRICKS_ITEM;
 
+    // === Nether Fortress ===
+    public static final ResourceKey<LootTable> LOOT_SUSPICIOUS_NETHER_BRICKS =
+            lootKey("blocks/suspicious_nether_bricks");
+
+    public static final DeferredBlock<RelicsBrushableBlock> SUSPICIOUS_NETHER_BRICKS = BLOCKS.register(
+            "suspicious_nether_bricks",
+            id -> new RelicsBrushableBlock(
+                    Blocks.NETHER_BRICKS,
+                    net.minecraft.sounds.SoundEvents.BRUSH_GENERIC,
+                    breakSoundOf(Blocks.NETHER_BRICKS),
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.NETHER_BRICKS)
+                            .setId(ResourceKey.create(Registries.BLOCK, id))
+            )
+    );
+
+    public static DeferredItem<BlockItem> SUSPICIOUS_NETHER_BRICKS_ITEM;
+
     public static void init() {
         SUSPICIOUS_MOSSY_COBBLESTONE_ITEM = ITEMS.register(
                 "suspicious_mossy_cobblestone",
@@ -129,6 +146,15 @@ public class RelicBlocks {
                         SUSPICIOUS_MOSSY_STONE_BRICKS.get(),
                         new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)),
                         LOOT_SUSPICIOUS_MOSSY_STONE_BRICKS
+                )
+        );
+
+        SUSPICIOUS_NETHER_BRICKS_ITEM = ITEMS.register(
+                "suspicious_nether_bricks",
+                id -> new RelicBrushableBlockItem(
+                        SUSPICIOUS_NETHER_BRICKS.get(),
+                        new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)),
+                        LOOT_SUSPICIOUS_NETHER_BRICKS
                 )
         );
     }

@@ -37,6 +37,7 @@ CUSTOM_BLOCKS = [
     ("mossy_stone_bricks",  "all",  "assets/minecraft/textures/block/mossy_stone_bricks.png"),
     ("chiseled_sandstone",  "side", "assets/minecraft/textures/block/chiseled_sandstone.png"),
     ("chiseled_sandstone",  "end",  "assets/minecraft/textures/block/sandstone_top.png"),
+    ("nether_bricks",       "all",  "assets/minecraft/textures/block/nether_bricks.png"),
 ]
 
 DARKEN_AMOUNT = 20

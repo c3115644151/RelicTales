@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:nether_brushing_converts_to_nether_bricks",
+    "max_ticks": 100,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}

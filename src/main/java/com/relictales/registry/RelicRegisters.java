@@ -36,7 +36,8 @@ public class RelicRegisters {
                 RelicBlocks.SUSPICIOUS_MOSSY_COBBLESTONE.get(),
                 RelicBlocks.SUSPICIOUS_CHISELED_SANDSTONE.get(),
                 RelicBlocks.SUSPICIOUS_CRACKED_STONE_BRICKS.get(),
-                RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS.get());
+                RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS.get(),
+                RelicBlocks.SUSPICIOUS_NETHER_BRICKS.get());
     }
 }
 

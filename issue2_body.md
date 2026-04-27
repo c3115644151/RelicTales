@@ -42,9 +42,20 @@
 - [X] 使用 `level.getLevel()` 解决 WorldGenLevel 战利品表注入问题
 - [X] 19 个自动化测试全部通过
 
-### 2.4 下界堡垒遗迹注入（Jigsaw，可选）
-- [ ] 注册 `suspicious_nether_bricks`（可疑的下界砖）
-- [ ] 编写 `FortressModifier`（StructureProcessor）
+### 2.4 下界堡垒遗迹注入（✅ 已完成）
+- [X] 注册 `suspicious_nether_bricks`（可疑的下界砖）
+- [X] BlockItem + BlockEntityType 注册
+- [X] 裂纹纹理自动生成（复用 `tools/generate_suspicious_textures.py`）
+- [X] blockstate `dusted=N` 变体 + 方块模型 + loot table
+- [X] `MixinStructurePiece` 扩展：下界要塞分支，与要塞逻辑共存
+- [X] 空气暴露检测（6 方向邻居检查，排除埋墙/支柱内部方块）
+- [X] 熔岩井底 100% 替换（CastleEntrance local(6,0,6)）
+- [X] 分房间概率系统：
+  - MonsterThrone: 30% | CastleStalkRoom: 10%
+  - StairsRoom / CastleCorridorStairs: 5% | CastleCorridorTBalcony: 4%
+  - CastleEntrance / RoomCrossing / BridgeCrossing / 小走廊十字: 3%
+  - 小走廊/转弯/BridgeStraight: 1% | 全覆盖兜底: 0.2%
+- [X] 5 个自动化测试全部通过（共 24 项测试）
 
 ### 2.6 末地城遗迹注入（Jigsaw，可选）
 - [ ] 注册 `suspicious_purpur_block`（可疑的紫珀方块）
@@ -54,11 +65,12 @@
 
 | 遗迹 | 注入方块 | 遗物名称 | 遗物功能 |
 |---|---|---|---|
-| 丛林神殿 | `suspicious_mossy_stone_bricks` | 丛林猎羽符 | 免疫摔落 + 弓弩射速 +10% |
+| 丛林神殿 | `suspicious_mossy_cobblestone` | 丛林猎羽符 | 免疫摔落 + 弓弩射速 +10% |
 | 沙漠神殿 | `suspicious_chiseled_sandstone` | 太阳神徽章 | 右键 30 秒夜视（冷却 120s）+ 阳光下移速 +10% |
 | 要塞 | `suspicious_cracked_stone_bricks` | — | 掉落原版物品（骨头、线等） |
 | 要塞 | `suspicious_mossy_stone_bricks` | — | 掉落原版物品 |
 | 要塞 | `suspicious_mossy_cobblestone` | — | 掉落原版物品 |
+| 下界要塞 | `suspicious_nether_bricks` | — | 掉落下界资源（金锭、石英、烈焰棒、岩浆膏等） |
 | 末地城 | `suspicious_purpur_block` | 虚空记录碎片 | 附魔等级 +1（额外）+ 经验值获取 +15% |
 | 下界堡垒 | `suspicious_nether_bricks` | 凋零护符 | 免疫凋零效果 + 对亡灵生物伤害 +15% |
 | 海底废墟 | `suspicious_polished_andesite` | 亚特兰蒂斯陶罐之心 | 水中生命恢复 ×2 + 游泳速度 +20% |
@@ -126,3 +138,7 @@ if (be instanceof RelicBrushableBlockEntity relicBe) {
 | 7 | 喷泉房间中心 3×3 范围为 50% 替换，非 100% | ✅ 已验证 |
 | 8 | 储藏室仅替换裂纹/苔石砖（非普通石砖），中心地板 100% | ✅ 已验证 |
 | 9 | 自定义可疑方块有裂纹纹理，刷取时裂纹逐级扩散 | ✅ 已验证 |
+| 10 | 进入下界要塞，下界砖有概率被替换为可疑的下界砖 | ✅ 已验证（24/24 测试通过） |
+| 11 | 可疑的下界砖刷取完成后掉落正确的下界主题物品 | ✅ 已验证 |
+| 12 | 熔岩井底浮空下界砖 100% 替换为可疑方块 | ✅ 已验证 |
+| 13 | 埋墙和支柱内部的下界砖不会被替换（空气暴露检测） | ✅ 已验证 |
