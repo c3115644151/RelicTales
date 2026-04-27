@@ -1,27 +1,44 @@
 package com.relictales.mixin;
 
+import com.relictales.content.block.RelicBrushableBlockEntity;
 import com.relictales.registry.blocks.RelicBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BrushableBlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.structures.JungleTemplePiece;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.levelgen.structure.ScatteredFeaturePiece;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.util.RandomSource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(JungleTemplePiece.class)
+import java.util.ArrayList;
+import java.util.List;
+
+@Mixin(value = JungleTemplePiece.class, remap = false)
 public abstract class MixinJungleTemplePiece {
 
-    @Inject(method = "postProcess", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void relictales$replaceMossyBricks(
+    private static final Logger LOG = LoggerFactory.getLogger("relictales");
+    private static final ResourceKey<LootTable> JUNGLE_TEMPLE_LOOT =
+            ResourceKey.create(Registries.LOOT_TABLE,
+                    Identifier.fromNamespaceAndPath("relictales", "blocks/suspicious_mossy_cobblestone"));
+
+    @Inject(method = "postProcess", at = @At("TAIL"), remap = false)
+    private void relictales$injectSuspiciousBlocks(
             WorldGenLevel level,
             StructureManager structureManager,
             ChunkGenerator chunkGenerator,
@@ -31,26 +48,59 @@ public abstract class MixinJungleTemplePiece {
             BlockPos referencePos,
             CallbackInfo ci
     ) {
-        // At TAIL, all blocks have been placed. Scan and replace MOSSY_STONE_BRICKS.
-        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
-        int minX = Math.min(boundingBox.minX(), referencePos.getX() - 11);
-        int maxX = Math.max(boundingBox.maxX(), referencePos.getX() + 11);
-        int minY = Math.max(boundingBox.minY(), referencePos.getY() - 10);
-        int maxY = Math.min(boundingBox.maxY(), referencePos.getY() + 10);
-        int minZ = Math.min(boundingBox.minZ(), referencePos.getZ() - 14);
-        int maxZ = Math.max(boundingBox.maxZ(), referencePos.getZ() + 14);
+        if (level.isClientSide()) return;
 
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
+        // Phase 1: Collect MOSSY_COBBLESTONE positions deterministically
+        List<BlockPos> positions = new ArrayList<>();
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+        long worldSeed = level.getSeed();
+
+        for (int x = boundingBox.minX(); x <= boundingBox.maxX(); x++) {
+            for (int y = boundingBox.minY(); y <= boundingBox.maxY(); y++) {
+                for (int z = boundingBox.minZ(); z <= boundingBox.maxZ(); z++) {
                     mutablePos.set(x, y, z);
                     BlockState state = level.getBlockState(mutablePos);
-                    if (state.is(Blocks.MOSSY_STONE_BRICKS)) {
-                        level.setBlock(mutablePos,
-                            RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS.get().defaultBlockState(), 3);
+                    if (state.is(Blocks.MOSSY_COBBLESTONE)) {
+                        long posSeed = worldSeed ^ (long) x * 198491317L ^ (long) y * 6542987L ^ (long) z * 357239L;
+                        if ((posSeed & 0xFFFF) < 0x3333) { // ~20% chance
+                            positions.add(new BlockPos(x, y, z));
+                        }
                     }
                 }
             }
         }
+
+        if (positions.isEmpty()) return;
+
+        // Phase 2: Defer to server tick to avoid blocking chunk generation
+        ServerLevel serverLevel = level.getLevel();
+        MinecraftServer server = serverLevel.getServer();
+        List<BlockPos> toInject = new ArrayList<>(positions);
+        long seed = worldSeed ^ 0x5EED5EEDL;
+
+        server.execute(() -> {
+            int count = 0;
+            long lootSeed = seed;
+            for (BlockPos pos : toInject) {
+                BlockState current = serverLevel.getBlockState(pos);
+                if (!current.is(Blocks.MOSSY_COBBLESTONE)) continue;
+
+                // Place our custom block (this triggers newBlockEntity → Mixin redirect → our custom BE)
+                BlockState newState = com.relictales.registry.blocks.RelicBlocks.SUSPICIOUS_MOSSY_COBBLESTONE.get().defaultBlockState();
+                serverLevel.setBlock(pos, newState, 2);
+
+                // Get the BE that was just created by setBlock (our custom BE via Mixin redirect)
+                BrushableBlockEntity be = (BrushableBlockEntity) serverLevel.getBlockEntity(pos);
+                if (be instanceof com.relictales.content.block.RelicBrushableBlockEntity relicBe) {
+                    relicBe.relictales$setLootTable(JUNGLE_TEMPLE_LOOT, lootSeed++);
+                    count++;
+                } else {
+                    LOG.warn("[RelicTales] BE at {} is not RelicBrushableBlockEntity (type={})", pos, be.getClass().getSimpleName());
+                }
+            }
+            if (count > 0) {
+                LOG.info("[RelicTales] Injected {} suspicious blocks into jungle temple", count);
+            }
+        });
     }
 }

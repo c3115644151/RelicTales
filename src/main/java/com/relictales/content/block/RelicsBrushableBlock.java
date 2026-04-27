@@ -1,19 +1,11 @@
 package com.relictales.content.block;
 
-import com.relictales.RelicTales;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BrushableBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootTable;
 
 public class RelicsBrushableBlock extends BrushableBlock {
-
-    public static BlockEntityType<RelicBrushableBlockEntity> BLOCK_ENTITY_TYPE = null;
 
     public RelicsBrushableBlock(
             net.minecraft.world.level.block.Block turnsInto,
@@ -26,21 +18,14 @@ public class RelicsBrushableBlock extends BrushableBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new RelicBrushableBlockEntity(BLOCK_ENTITY_TYPE, pos, state);
+        return new RelicBrushableBlockEntity(pos, state);
     }
 
-    @Override
-    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
-        super.onPlace(state, level, pos, oldState, movedByPiston);
-        if (!level.isClientSide()) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be instanceof RelicBrushableBlockEntity relicBe) {
-                ResourceKey<LootTable> lootKey = ResourceKey.create(
-                        Registries.LOOT_TABLE,
-                        net.minecraft.resources.Identifier.fromNamespaceAndPath(RelicTales.MOD_ID, "blocks/suspicious_mossy_stone_bricks")
-                );
-                relicBe.setLootTable(lootKey, 0L);
-            }
+    public void relictales$setLootTableOnBe(BlockEntity be,
+            net.minecraft.resources.ResourceKey<net.minecraft.world.level.storage.loot.LootTable> lootTable,
+            long seed) {
+        if (be instanceof RelicBrushableBlockEntity relicBe) {
+            relicBe.relictales$setLootTable(lootTable, seed);
         }
     }
 }

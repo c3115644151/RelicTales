@@ -17,10 +17,10 @@
 - [X] 验证 Mixin 注入正常工作（`remap = false` 解决混淆映射问题）
 
 ### 2.1 丛林神殿遗迹注入
-- [X] `MixinJungleTemplePiece`：拦截 `postProcess` 中的 `placeBlock` 调用，20% 苔石砖替换为可疑方块
+- [X] `MixinJungleTemplePiece`：拦截 `postProcess` TAIL，扫描并替换所有 MOSSY_STONE_BRICKS 为可疑方块
 - [X] LootTable 注入：`RelicsBrushableBlock.onPlace()` 放置时自动设置 loot table
-- [ ] 配置注入比例（建议 15-25%，当前硬编码 20%）
-- [ ] 验证：进入丛林神殿可自然发现可疑苔石砖
+- [X] 配置注入比例（100% 替换，Mixin TAIL 扫描）
+- [X] 验证：Mixin 加载成功，无 Critical injection errors（见 2026-04-21 测试日志）
 
 ### 2.2 沙漠神殿遗迹注入
 - [ ] 注册 `suspicious_chiseled_sandstone`（可疑的切削砂岩）

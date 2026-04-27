@@ -3,6 +3,8 @@
   "package": "com.relictales.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "BrushableBlockEntityAccessor",
+    "BrushableBlockEntityInvoker",
     "MixinJungleTemplePiece"
   ],
   "injectors": {

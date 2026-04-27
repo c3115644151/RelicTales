@@ -214,6 +214,9 @@ public static class ArchaeologyConfig {
 | `processBlock(..., originalInfo, currentInfo)` | ✅ 参数名正确但语义变了 | `currentBlockInfo` = 经前面处理器处理后的状态 |
 | `DeferredHolder<StructureProcessorType<?>, T>` 嵌套泛型 | `DeferredHolder<StructureProcessorType<?>, StructureProcessorType<T>>` | `DeferredHolder<T, V>` 中 V 是包装类型本身 |
 | 仅有 `models/item/<name>.json`（ItemModel） | 同时需要 `items/<name>.json`（ClientItem）引用 ItemModel | 1.21.x 物品模型需双层：ItemModel 定义几何 + ClientItem 配置渲染 |
+| Mixin JSON 放在 `META-INF/` 子目录 | Mixin JSON 放在 resources **根目录** | `FolderJarContents` Windows 路径解析 bug，classes 根目录才能正确读取 |
+| `@Inject(method = "...", at = @At("HEAD"))` 默认 remap | Mixin dev 环境需 `remap = false` | ModDevGradle 缺少 SRG 映射，`remap = false` 跳过混淆查找 |
+| `@Inject(method = "placeBlock")` 拦截 JungleTemplePiece | 注入父类方法无效 → 改用 `postProcess` TAIL 后置扫描 | `placeBlock` 定义在 `StructurePiece`，`JungleTemplePiece` 未 override |
 
 **1.21 考古音效正确名称**：
 ```
