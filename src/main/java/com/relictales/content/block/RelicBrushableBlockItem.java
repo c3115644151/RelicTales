@@ -11,8 +11,11 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 public class RelicBrushableBlockItem extends BlockItem {
 
-    public RelicBrushableBlockItem(Block block, Properties properties) {
+    private final ResourceKey<LootTable> lootTableKey;
+
+    public RelicBrushableBlockItem(Block block, Properties properties, ResourceKey<LootTable> lootTableKey) {
         super(block, properties);
+        this.lootTableKey = lootTableKey;
     }
 
     @Override
@@ -27,10 +30,7 @@ public class RelicBrushableBlockItem extends BlockItem {
     private void applyLootTableNbt(BlockPlaceContext ctx) {
         var be = ctx.getLevel().getBlockEntity(ctx.getClickedPos());
         if (be instanceof RelicBrushableBlockEntity relicBe) {
-            ResourceKey<LootTable> lootKey = ResourceKey.create(
-                    Registries.LOOT_TABLE,
-                    Identifier.fromNamespaceAndPath("relictales", "blocks/suspicious_mossy_cobblestone"));
-            relicBe.relictales$setLootTable(lootKey, ctx.getClickedPos().asLong());
+            relicBe.relictales$setLootTable(this.lootTableKey, ctx.getClickedPos().asLong());
         }
     }
 }

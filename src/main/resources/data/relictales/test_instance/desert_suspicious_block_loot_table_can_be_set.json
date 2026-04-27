@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:desert_suspicious_block_loot_table_can_be_set",
+    "max_ticks": 100,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}

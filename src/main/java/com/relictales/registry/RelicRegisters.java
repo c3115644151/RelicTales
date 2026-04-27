@@ -33,7 +33,10 @@ public class RelicRegisters {
 
     private static void onBlockEntityTypeAddBlocks(BlockEntityTypeAddBlocksEvent event) {
         event.modify(net.minecraft.world.level.block.entity.BlockEntityType.BRUSHABLE_BLOCK,
-                RelicBlocks.SUSPICIOUS_MOSSY_COBBLESTONE.get());
+                RelicBlocks.SUSPICIOUS_MOSSY_COBBLESTONE.get(),
+                RelicBlocks.SUSPICIOUS_CHISELED_SANDSTONE.get(),
+                RelicBlocks.SUSPICIOUS_CRACKED_STONE_BRICKS.get(),
+                RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS.get());
     }
 }
 

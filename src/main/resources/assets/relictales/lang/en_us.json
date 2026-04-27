@@ -2,5 +2,12 @@
   "itemGroup.relictales": "Relic Tales",
   "block.relictales.suspicious_mossy_cobblestone": "【TEST】Suspicious Mossy Cobblestone",
   "item.relictales.suspicious_mossy_cobblestone": "【TEST】Suspicious Mossy Cobblestone",
-  "item.relictales.jungle_hunter_feather": "Jungle Hunter Feather"
+  "item.relictales.jungle_hunter_feather": "Jungle Hunter Feather",
+  "block.relictales.suspicious_chiseled_sandstone": "【TEST】Suspicious Chiseled Sandstone",
+  "item.relictales.suspicious_chiseled_sandstone": "【TEST】Suspicious Chiseled Sandstone",
+  "item.relictales.sun_god_badge": "Sun God Badge",
+  "block.relictales.suspicious_cracked_stone_bricks": "【TEST】Suspicious Cracked Stone Bricks",
+  "item.relictales.suspicious_cracked_stone_bricks": "【TEST】Suspicious Cracked Stone Bricks",
+  "block.relictales.suspicious_mossy_stone_bricks": "【TEST】Suspicious Mossy Stone Bricks",
+  "item.relictales.suspicious_mossy_stone_bricks": "【TEST】Suspicious Mossy Stone Bricks"
 }

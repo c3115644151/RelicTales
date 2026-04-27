@@ -1,5 +1,0 @@
-{
-    "structure": "minecraft:empty",
-    "function": "relictales:suspiciousBlock_hasCorrectBlockEntityType",
-    "required": true
-}

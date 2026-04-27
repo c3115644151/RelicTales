@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:vanilla_block_uses_vanilla_be",
+    "max_ticks": 100,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}

@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:desert_brushing_converts_to_chiseled_sandstone",
+    "max_ticks": 120,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}

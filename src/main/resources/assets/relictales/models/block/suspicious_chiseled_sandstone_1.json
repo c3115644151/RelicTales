@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "relictales:block/suspicious_chiseled_sandstone_end_1",
+    "side": "relictales:block/suspicious_chiseled_sandstone_side_1"
+  }
+}

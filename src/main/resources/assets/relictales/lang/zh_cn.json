@@ -2,5 +2,12 @@
   "itemGroup.relictales": "考古物语",
   "block.relictales.suspicious_mossy_cobblestone": "可疑的苔石",
   "item.relictales.suspicious_mossy_cobblestone": "可疑的苔石",
-  "item.relictales.jungle_hunter_feather": "丛林猎羽符"
+  "item.relictales.jungle_hunter_feather": "丛林猎羽符",
+  "block.relictales.suspicious_chiseled_sandstone": "可疑的雕纹砂岩",
+  "item.relictales.suspicious_chiseled_sandstone": "可疑的雕纹砂岩",
+  "item.relictales.sun_god_badge": "太阳神徽章",
+  "block.relictales.suspicious_cracked_stone_bricks": "可疑的裂纹石砖",
+  "item.relictales.suspicious_cracked_stone_bricks": "可疑的裂纹石砖",
+  "block.relictales.suspicious_mossy_stone_bricks": "可疑的苔石砖",
+  "item.relictales.suspicious_mossy_stone_bricks": "可疑的苔石砖"
 }

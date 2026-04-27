@@ -21,11 +21,14 @@ All decisions must align with the MVP-first philosophy documented in DESIGN_DOC.
 ## 二、构建命令
 
 ```bash
-./gradlew build           # 完整构建
-./gradlew runClient       # 运行测试客户端
-./gradlew runData         # 运行数据生成器（BlockStates / LootTables / Lang）
-./gradlew clean build     # 清理并重新构建
+./gradlew build               # 完整构建
+./gradlew runClient           # 运行测试客户端（用于游戏内目视验证）
+./gradlew runGameTestServer   # 运行自动化游戏测试（无头服务器，验证所有注册的测试）
+./gradlew runData             # 运行数据生成器（BlockStates / LootTables / Lang）
+./gradlew clean build         # 清理并重新构建
 ```
+
+> ⚠️ **测试命令提示**：`runGameTestServer` 需要 `data/<namespace>/test_instance/*.json` 文件来发现测试实例。修改测试逻辑后必须同步创建/更新对应的 JSON 文件。`runClient` 仅供最终美术验证，不应用作回归测试手段。
 
 ---
 
@@ -284,17 +287,82 @@ SoundEvents.BRUSH_SAND_COMPLETED   ✅
 
 ## 十一、开发工作流
 
+### 11.1 测试先行（强制执行）
+
+**所有逻辑代码的修改必须遵循测试先行原则**，具体流程如下：
+
+```
+Write Tests → Write Code → runGameTestServer → Green
+```
+
+详细步骤：
+
 ```
 1. 查阅知识库文档（knowledge-base/reference/neoForge/）
 2. 确认遗迹类型：Legacy → Mixin / Jigsaw → StructureProcessor
-3. 编写 Java 注册代码（RelicBlocks / RelicItems / ModStructureProcessors）
-4. 编写配置类（RelicConfig.java），将所有数值移入配置
-5. 编写 Datagen（BlockStates / LootTables / Lang）
-6. 编写遗迹注入逻辑（Jigsaw 用 StructureProcessor + JSON；Legacy 用 Mixin）
-7. ./gradlew build      ← 验证编译
-8. ./gradlew runClient ← 游戏内验证
-9. 开发者反馈感受 → 进入下一轮迭代
+3. 【测试先行】在编写任何逻辑代码前，先完成以下测试准备工作：
+   a. 在 RelicBrushInteractionTest.java（src/main/java/.../test/）中注册新的 DeferredHolder 测试函数
+   b. 在 src/main/resources/data/relictales/test_instance/ 下创建对应的 JSON 文件
+      （含 "type": "minecraft:function" 字段）
+4. 编写 Java 注册代码（RelicBlocks / RelicItems / ModStructureProcessors）
+5. 编写配置类（RelicConfig.java），将所有数值移入配置
+6. 编写 Datagen（BlockStates / LootTables / Lang）
+7. 编写逻辑代码（方块行为、遗迹注入等）
+8. ./gradlew build               ← 验证编译
+9. ./gradlew runGameTestServer   ← ⚠️ 强制：自动化测试验证（而非手动目视验证）
+10. 若测试失败 → 修复代码 → 回到步骤 9
+11. 所有测试通过后 → ./gradlew runClient（可选，仅用于美术或体验验证）
+12. 开发者反馈感受 → 进入下一轮迭代
 ```
+
+### 11.2 测试文件规范
+
+**测试函数注册位置**：`src/main/java/com/relictales/test/RelicBrushInteractionTest.java`
+
+```java
+// 1. 声明静态 DeferredHolder 字段
+private static DeferredHolder<Consumer<GameTestHelper>, Consumer<GameTestHelper>> TESTn_FUNCTION;
+
+// 2. 在 static 块中注册函数
+static {
+    TESTn_FUNCTION = TEST_FUNCTIONS.register("test_name", () -> helper -> {
+        // 测试逻辑
+    });
+}
+```
+
+**测试实例 JSON**：`src/main/resources/data/relictales/test_instance/<test_name>.json`
+
+```json
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:<test_name>",
+    "max_ticks": 100,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}
+```
+
+> ⚠️ `"type": "minecraft:function"` 字段必不可少 —— `runGameTestServer` 依赖该字段通过 DIRECT_CODEC 反序列化测试实例。缺失会导致 `No key type` 错误。
+
+### 11.3 测试覆盖原则
+
+每项新功能至少覆盖以下维度：
+- **存在性验证**：方块/BE 是否正确注册和创建
+- **行为验证**：核心交互是否按预期工作（如刷取完成 → 方块转换 + 掉落物）
+- **回归验证**：原版同类方块是否不受影响
+- **属性验证**：硬度、声音组、无重力等配置是否正确
+
+### 11.4 严禁手动目视替代
+
+| ❌ 不要 | ✅ 应该 |
+|---------|---------|
+| `./gradlew runClient` 后手动找遗迹测试 | `./gradlew runGameTestServer` 自动化验证 |
+| "看起来没问题" 替代测试通过 | 所有测试必须 Green 才能提交 |
+| 修改代码后不更新测试文件 | 修改代码前先准备测试文件和测试函数 |
 
 ---
 

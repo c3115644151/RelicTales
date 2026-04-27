@@ -22,7 +22,11 @@ public class CreativeTab {
                     .icon(() -> new ItemStack(RelicItems.JUNGLE_HUNTER_FEATHER.get()))
                     .displayItems((parameters, output) -> {
                         output.accept(RelicItems.JUNGLE_HUNTER_FEATHER);
+                        output.accept(RelicItems.SUN_GOD_BADGE);
                         output.accept(RelicBlocks.SUSPICIOUS_MOSSY_COBBLESTONE_ITEM);
+                        output.accept(RelicBlocks.SUSPICIOUS_CHISELED_SANDSTONE_ITEM);
+                        output.accept(RelicBlocks.SUSPICIOUS_CRACKED_STONE_BRICKS_ITEM);
+                        output.accept(RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS_ITEM);
                     })
                     .build()
     );

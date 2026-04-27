@@ -1,7 +1,16 @@
 {
   "variants": {
-    "": {
-      "model": "relictales:block/suspicious_mossy_cobblestone"
+    "dusted=0": {
+      "model": "relictales:block/suspicious_mossy_cobblestone_0"
+    },
+    "dusted=1": {
+      "model": "relictales:block/suspicious_mossy_cobblestone_1"
+    },
+    "dusted=2": {
+      "model": "relictales:block/suspicious_mossy_cobblestone_2"
+    },
+    "dusted=3": {
+      "model": "relictales:block/suspicious_mossy_cobblestone_3"
     }
   }
 }

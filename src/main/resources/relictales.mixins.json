@@ -5,7 +5,12 @@
   "mixins": [
     "BrushableBlockEntityAccessor",
     "BrushableBlockEntityInvoker",
-    "MixinJungleTemplePiece"
+    "MixinJungleTemplePiece",
+    "MixinDesertPyramidPiece",
+    "MixinStructurePiece",
+    "MixinChestCorridor",
+    "RoomCrossingAccessor",
+    "StructurePieceInvoker"
   ],
   "injectors": {
     "defaultRequire": 1

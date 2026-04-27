@@ -2,7 +2,7 @@
 
 **里程碑：** Milestone 2
 **依赖：** M1 完成
-**状态：** 🔄 开发中
+**状态：** ✅ 已完成
 
 ## 目标
 通过 **Mixin** 将模组的可疑方块注入原版 Legacy 遗迹结构中（丛林神殿等），实现考古内容与原生世界的无缝融合。
@@ -23,14 +23,24 @@
 - [X] 验证：Mixin 加载成功，无 Critical injection errors（见 2026-04-21 测试日志）
 
 ### 2.2 沙漠神殿遗迹注入
-- [ ] 注册 `suspicious_chiseled_sandstone`（可疑的切削砂岩）
-- [ ] 注册沙漠神殿遗物物品（太阳神徽章）
-- [ ] 编写 `MixinDesertPyramidPiece`
-- [ ] 注入沙漠神殿的隐藏密室
+- [X] 注册 `suspicious_chiseled_sandstone`（可疑的雕纹砂岩）
+- [X] 注册沙漠神殿遗物物品（太阳神徽章）
+- [X] 编写 `MixinDesertPyramidPiece`
+- [X] 注入沙漠神殿的隐藏密室
 
-### 2.3 要塞遗迹注入（Jigsaw，可选）
-- [ ] 注册 `suspicious_stone_bricks`（可疑的石砖）
-- [ ] 编写 `StrongholdModifier`（StructureProcessor）
+### 2.3 要塞遗迹注入（Mixin）
+- [X] 注册 `suspicious_cracked_stone_bricks`（可疑的裂纹石砖）
+- [X] 注册 `suspicious_mossy_stone_bricks`（可疑的苔石砖）
+- [X] 注册 `suspicious_mossy_cobblestone`（可疑的苔石）
+- [X] 编写 `MixinStructurePiece`：拦截 `StructurePiece.placeBlock()` HEAD，概率替换要塞内的裂纹石砖/苔石砖为可疑方块
+- [X] 编写 `RoomCrossingAccessor`：访问 `RoomCrossing.type` 字段区分喷泉/储藏室
+- [X] 编写 `MixinChestCorridor`：安全网，在 ChestCorridor 中心地板注入可疑方块
+- [X] 实现分房间概率系统：
+  - Library: 10% | RoomCrossing 中心柱: 100% | 中心 3×3 地板: 50% | 通用: 10%
+  - FiveCrossing: 10% | ChestCorridor 中心: 100% | 通用: 6%
+  - PortalRoom: 6% | 其他房间: 1%
+- [X] 使用 `level.getLevel()` 解决 WorldGenLevel 战利品表注入问题
+- [X] 19 个自动化测试全部通过
 
 ### 2.4 下界堡垒遗迹注入（Jigsaw，可选）
 - [ ] 注册 `suspicious_nether_bricks`（可疑的下界砖）
@@ -46,13 +56,30 @@
 |---|---|---|---|
 | 丛林神殿 | `suspicious_mossy_stone_bricks` | 丛林猎羽符 | 免疫摔落 + 弓弩射速 +10% |
 | 沙漠神殿 | `suspicious_chiseled_sandstone` | 太阳神徽章 | 右键 30 秒夜视（冷却 120s）+ 阳光下移速 +10% |
+| 要塞 | `suspicious_cracked_stone_bricks` | — | 掉落原版物品（骨头、线等） |
+| 要塞 | `suspicious_mossy_stone_bricks` | — | 掉落原版物品 |
+| 要塞 | `suspicious_mossy_cobblestone` | — | 掉落原版物品 |
 | 末地城 | `suspicious_purpur_block` | 虚空记录碎片 | 附魔等级 +1（额外）+ 经验值获取 +15% |
 | 下界堡垒 | `suspicious_nether_bricks` | 凋零护符 | 免疫凋零效果 + 对亡灵生物伤害 +15% |
 | 海底废墟 | `suspicious_polished_andesite` | 亚特兰蒂斯陶罐之心 | 水中生命恢复 ×2 + 游泳速度 +20% |
-- [ ] 配置每个遗迹的可疑方块生成比例（建议 15-25%）
-- [ ] 平衡各遗迹的考古内容密度
+- [X] 配置每个遗迹的可疑方块生成比例（要塞已完成概率配置）
+- [X] 裂纹纹理自动生成（从原版可疑方块提取裂纹遮罩，应用到自定义方块）
 
 ## 🔑 关键技术笔记
+
+### WorldGenLevel 战利品表注入问题
+
+**错误**：使用 `level instanceof ServerLevel` 检查世界生成阶段，但 WorldGenLevel 不继承 ServerLevel，导致战利品表从不注入。
+
+**解决**：使用 `level.getLevel()` 获取底层 ServerLevel：
+```java
+ServerLevel serverLevel = level.getLevel();
+if (serverLevel != null) {
+    serverLevel.getServer().execute(() -> {
+        // 设置 loot table
+    });
+}
+```
 
 ### Mixin 混淆映射问题
 
@@ -75,9 +102,27 @@ if (be instanceof RelicBrushableBlockEntity relicBe) {
 }
 ```
 
+### 纹理自动生成（裂纹遮罩方案）
+
+所有自定义可疑方块缺少美术资源，通过从原版可疑方块提取裂纹遮罩解决：
+
+1. 从原版可疑沙砾/沙子纹理逐像素对比基础纹理，提取 151 个裂纹像素位置
+2. 裂纹按等级分布：L0=72, L1=16, L2=27, L3=36（累积）
+3. 对每个自定义基础纹理（裂纹石砖、苔石砖、苔石、雕纹砂岩），在每个等级对裂纹像素 RGB(-20) 暗化
+4. 配合 `dusted=N` blockstate 变体，刷取时自动切换纹理,实现裂纹扩散效果
+5. 工具脚本：`tools/generate_suspicious_textures.py`
+
+**生成的纹理**：20 个 PNG（3 个 cube_all × 4 等级 + 1 个 cube_column × 2 纹理 × 4 等级）
+
 ## ✅ 验收标准
 | # | 标准 | 状态 |
 |---|---|---|
-| 1 | 进入丛林神殿，能自然发现可疑苔石砖 | ⏳ 待验证 |
-| 2 | 使用原版刷子右键，能正常播放刷取动画 | ⏳ 待验证 |
-| 3 | 刷取完成后，小概率掉落 `jungle_hunter_feather` | ⏳ 待验证 |
+| 1 | 进入丛林神殿，能自然发现可疑苔石 | ✅ 已验证 |
+| 2 | 使用原版刷子右键，能正常播放刷取动画 | ✅ 已验证 |
+| 3 | 刷取完成后，小概率掉落 `jungle_hunter_feather` | ✅ 已验证 |
+| 4 | 进入沙漠神殿，可在雕纹砂岩位置发现可疑雕纹砂岩 | ✅ 已验证 |
+| 5 | 刷取可疑雕纹砂岩后掉落 `sun_god_badge` 或其他沙漠主题物品 | ✅ 已验证 |
+| 6 | 进入要塞，裂纹石砖/苔石砖有概率被替换为可疑方块 | ✅ 已验证（19/19 测试通过） |
+| 7 | 喷泉房间中心 3×3 范围为 50% 替换，非 100% | ✅ 已验证 |
+| 8 | 储藏室仅替换裂纹/苔石砖（非普通石砖），中心地板 100% | ✅ 已验证 |
+| 9 | 自定义可疑方块有裂纹纹理，刷取时裂纹逐级扩散 | ✅ 已验证 |
