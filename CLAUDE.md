@@ -154,6 +154,13 @@ public RelicTales(IEventBus bus) {
 > 所有物品优先查找原版中功能相近的资源进行扩展或替换。
 > 自定义物品仅在原版无替代品时创建。
 
+### 6.4 可疑方块纹理：程序化裂纹生成
+
+> 原版可疑方块使用**预烘焙 PNG**（非运行时叠加层），每个 `dusted=N` 等级对应独立纹理。
+> 自定义可疑方块的裂纹纹理可以从原版可疑沙砾/沙子中提取裂纹遮罩后程序化生成。
+>
+> 工具脚本：`tools/generate_suspicious_textures.py`
+
 ---
 
 ## 七、配置驱动原则（强制执行）
@@ -220,6 +227,8 @@ public static class ArchaeologyConfig {
 | Mixin JSON 放在 `META-INF/` 子目录 | Mixin JSON 放在 resources **根目录** | `FolderJarContents` Windows 路径解析 bug，classes 根目录才能正确读取 |
 | `@Inject(method = "...", at = @At("HEAD"))` 默认 remap | Mixin dev 环境需 `remap = false` | ModDevGradle 缺少 SRG 映射，`remap = false` 跳过混淆查找 |
 | `@Inject(method = "placeBlock")` 拦截 JungleTemplePiece | 注入父类方法无效 → 改用 `postProcess` TAIL 后置扫描 | `placeBlock` 定义在 `StructurePiece`，`JungleTemplePiece` 未 override |
+| `lootKey.location()` 获取 Identifier | `expectedKey.equals(actualKey)` 直接比较 ResourceKey | 26.1 中 ResourceKey 无 `location()` 方法 |
+| `@Mixin(OuterClass.InnerClass.class)` 引用内部类 | `@Mixin(targets = "pkg.OuterClass$InnerClass")` 字符串形式 | 内部类 JVM 名为 `Outer$Inner`，不能用 `.class` 引用 |
 
 **1.21 考古音效正确名称**：
 ```
