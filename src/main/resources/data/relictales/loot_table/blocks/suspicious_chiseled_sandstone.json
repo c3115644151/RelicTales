@@ -22,11 +22,6 @@
         },
         {
           "type": "minecraft:item",
-          "name": "relictales:sun_god_badge",
-          "weight": 1
-        },
-        {
-          "type": "minecraft:item",
           "name": "minecraft:emerald",
           "weight": 1
         },

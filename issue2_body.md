@@ -61,19 +61,11 @@
 - [ ] 注册 `suspicious_purpur_block`（可疑的紫珀方块）
 - [ ] 编写 `EndCityModifier`（StructureProcessor）
 
-### 遗迹产出定义（已选定）
+### 遗迹产出定义（已废弃 — 待重新设计）
 
-| 遗迹 | 注入方块 | 遗物名称 | 遗物功能 |
-|---|---|---|---|
-| 丛林神殿 | `suspicious_mossy_cobblestone` | 丛林猎羽符 | 免疫摔落 + 弓弩射速 +10% |
-| 沙漠神殿 | `suspicious_chiseled_sandstone` | 太阳神徽章 | 右键 30 秒夜视（冷却 120s）+ 阳光下移速 +10% |
-| 要塞 | `suspicious_cracked_stone_bricks` | — | 掉落原版物品（骨头、线等） |
-| 要塞 | `suspicious_mossy_stone_bricks` | — | 掉落原版物品 |
-| 要塞 | `suspicious_mossy_cobblestone` | — | 掉落原版物品 |
-| 下界要塞 | `suspicious_nether_bricks` | — | 掉落下界资源（金锭、石英、烈焰棒、岩浆膏等） |
-| 末地城 | `suspicious_purpur_block` | 虚空记录碎片 | 附魔等级 +1（额外）+ 经验值获取 +15% |
-| 下界堡垒 | `suspicious_nether_bricks` | 凋零护符 | 免疫凋零效果 + 对亡灵生物伤害 +15% |
-| 海底废墟 | `suspicious_polished_andesite` | 亚特兰蒂斯陶罐之心 | 水中生命恢复 ×2 + 游泳速度 +20% |
+> 旧版遗物设计（丛林猎羽符、太阳神徽章、凋零护符等）已全部清理。这些数值化 RPG 物品不符合模组的新设计哲学。
+> 新的考古产出方案待 M3 讨论确定。
+
 - [X] 配置每个遗迹的可疑方块生成比例（要塞已完成概率配置）
 - [X] 裂纹纹理自动生成（从原版可疑方块提取裂纹遮罩，应用到自定义方块）
 
