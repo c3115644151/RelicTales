@@ -11,7 +11,7 @@ All decisions must align with the MVP-first philosophy documented in DESIGN_DOC.
 |---|---|
 | 模组名称 | RelicTales（考古物语） |
 | Mod ID | `relictales` |
-| Minecraft 版本 | 1.21.4 |
+| Minecraft 版本 | 26.1.1 |
 | Mod Loader | NeoForge 26.1.1.14-beta |
 | Java | 25（Foojay resolver 自动管理） |
 | 核心理念 | Vanilla+ 原版增强考古，零诅咒，零自定义工具分级 |
@@ -229,6 +229,9 @@ public static class ArchaeologyConfig {
 | `@Inject(method = "placeBlock")` 拦截 JungleTemplePiece | 注入父类方法无效 → 改用 `postProcess` TAIL 后置扫描 | `placeBlock` 定义在 `StructurePiece`，`JungleTemplePiece` 未 override |
 | `lootKey.location()` 获取 Identifier | `expectedKey.equals(actualKey)` 直接比较 ResourceKey | 26.1 中 ResourceKey 无 `location()` 方法 |
 | `@Mixin(OuterClass.InnerClass.class)` 引用内部类 | `@Mixin(targets = "pkg.OuterClass$InnerClass")` 字符串形式 | 内部类 JVM 名为 `Outer$Inner`，不能用 `.class` 引用 |
+| `CompoundTag.getString(key)` 返回 `String` | `CompoundTag.getString(key)` 返回 **`Optional<String>`** | 1.21.4 改为了 Optional，必须用 `.orElse("")` 解包 |
+| `@Inject(method = "placeBlock")` 拦截 EndCityPiece | 改用 `@Inject(method = "postProcess")` TAIL + filterBlocks | EndCityPiece 继承 `TemplateStructurePiece`，不重写 `placeBlock` |
+| EndCityPiece 使用 processor_list JSON | **processor_list 对 EndCityPiece 无效** | `StructureProcessor` 在 `placeInWorld` 中被覆盖，必须用 Mixin |
 
 **1.21 考古音效正确名称**：
 ```
@@ -281,7 +284,7 @@ SoundEvents.BRUSH_SAND_COMPLETED   ✅
 | 沙漠神殿 | **Legacy（硬编码）** | ❌ `processor_list` 不可用 → 需要 **Mixin** |
 | 要塞 | Jigsaw ✅ | ✅ StructureProcessor + processor_list JSON |
 | 下界堡垒 | Jigsaw ✅ | ✅ StructureProcessor + processor_list JSON |
-| 末地城 | Jigsaw ✅ | ✅ StructureProcessor + processor_list JSON |
+| **末地城** | **Jigsaw → TemplateStructurePiece** | ⚠️ processor_list JSON 注册**不生效** → 必须用 **Mixin postProcess TAIL** |
 
 **详见**：`knowledge-base/reference/neoForge/NeoForge-世界生成-结构.md` → "Legacy 结构与注入方案"章节
 

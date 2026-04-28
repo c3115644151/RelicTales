@@ -112,6 +112,23 @@ public class RelicBlocks {
 
     public static DeferredItem<BlockItem> SUSPICIOUS_NETHER_BRICKS_ITEM;
 
+    // === End City ===
+    public static final ResourceKey<LootTable> LOOT_SUSPICIOUS_PURPUR_BLOCK =
+            lootKey("blocks/suspicious_purpur_block");
+
+    public static final DeferredBlock<RelicsBrushableBlock> SUSPICIOUS_PURPUR_BLOCK = BLOCKS.register(
+            "suspicious_purpur_block",
+            id -> new RelicsBrushableBlock(
+                    Blocks.PURPUR_BLOCK,
+                    net.minecraft.sounds.SoundEvents.BRUSH_GENERIC,
+                    breakSoundOf(Blocks.PURPUR_BLOCK),
+                    BlockBehaviour.Properties.ofFullCopy(Blocks.PURPUR_BLOCK)
+                            .setId(ResourceKey.create(Registries.BLOCK, id))
+            )
+    );
+
+    public static DeferredItem<BlockItem> SUSPICIOUS_PURPUR_BLOCK_ITEM;
+
     public static void init() {
         SUSPICIOUS_MOSSY_COBBLESTONE_ITEM = ITEMS.register(
                 "suspicious_mossy_cobblestone",
@@ -155,6 +172,15 @@ public class RelicBlocks {
                         SUSPICIOUS_NETHER_BRICKS.get(),
                         new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)),
                         LOOT_SUSPICIOUS_NETHER_BRICKS
+                )
+        );
+
+        SUSPICIOUS_PURPUR_BLOCK_ITEM = ITEMS.register(
+                "suspicious_purpur_block",
+                id -> new RelicBrushableBlockItem(
+                        SUSPICIOUS_PURPUR_BLOCK.get(),
+                        new Item.Properties().setId(ResourceKey.create(Registries.ITEM, id)),
+                        LOOT_SUSPICIOUS_PURPUR_BLOCK
                 )
         );
     }

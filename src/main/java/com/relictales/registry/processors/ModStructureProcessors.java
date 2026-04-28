@@ -2,6 +2,7 @@ package com.relictales.registry.processors;
 
 import com.mojang.serialization.MapCodec;
 import com.relictales.RelicTales;
+import com.relictales.content.structure.EndCityProcessor;
 import com.relictales.content.structure.JungleTempleProcessor;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
@@ -15,6 +16,9 @@ public class ModStructureProcessors {
 
     public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<JungleTempleProcessor>> JUNGLE_TEMPLE_PROCESSOR =
             PROCESSORS.register("jungle_temple_processor", () -> () -> JungleTempleProcessor.CODEC);
+
+    public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<EndCityProcessor>> END_CITY_PROCESSOR =
+            PROCESSORS.register("end_city_processor", () -> () -> EndCityProcessor.CODEC);
 
     public static void init() {
     }

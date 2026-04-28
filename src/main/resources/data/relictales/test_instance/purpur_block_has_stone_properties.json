@@ -1,0 +1,10 @@
+{
+    "type": "minecraft:function",
+    "environment": "relictales:default",
+    "structure": "minecraft:empty",
+    "function": "relictales:purpur_block_has_stone_properties",
+    "max_ticks": 100,
+    "setup_ticks": 5,
+    "required": true,
+    "rotation": "none"
+}

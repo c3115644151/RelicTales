@@ -25,6 +25,7 @@ public class CreativeTab {
                         output.accept(RelicBlocks.SUSPICIOUS_CRACKED_STONE_BRICKS_ITEM);
                         output.accept(RelicBlocks.SUSPICIOUS_MOSSY_STONE_BRICKS_ITEM);
                         output.accept(RelicBlocks.SUSPICIOUS_NETHER_BRICKS_ITEM);
+                        output.accept(RelicBlocks.SUSPICIOUS_PURPUR_BLOCK_ITEM);
                     })
                     .build()
     );

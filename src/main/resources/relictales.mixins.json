@@ -9,6 +9,7 @@
     "MixinDesertPyramidPiece",
     "MixinStructurePiece",
     "MixinChestCorridor",
+    "MixinEndCityProcessor",
     "RoomCrossingAccessor",
     "StructurePieceInvoker"
   ],
