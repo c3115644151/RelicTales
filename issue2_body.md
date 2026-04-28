@@ -55,11 +55,26 @@
   - StairsRoom / CastleCorridorStairs: 5% | CastleCorridorTBalcony: 4%
   - CastleEntrance / RoomCrossing / BridgeCrossing / 小走廊十字: 3%
   - 小走廊/转弯/BridgeStraight: 1% | 全覆盖兜底: 0.2%
-- [X] 5 个自动化测试全部通过（共 24 项测试）
+- [X] 5 个自动化测试全部通过
 
-### 2.6 末地城遗迹注入（Jigsaw，可选）
-- [ ] 注册 `suspicious_purpur_block`（可疑的紫珀方块）
-- [ ] 编写 `EndCityModifier`（StructureProcessor）
+### 2.6 末地城遗迹注入（Jigsaw → TemplateStructurePiece，✅ 已完成）
+- [X] 注册 `suspicious_purpur_block`（可疑的紫珀方块）
+- [X] BlockItem + BlockEntityType 注册
+- [X] 裂纹纹理自动生成（复用 `tools/generate_suspicious_textures.py`）
+- [X] blockstate `dusted=N` 变体 + 方块模型 + loot table
+- [X] `MixinEndCityProcessor`：拦截 `TemplateStructurePiece.postProcess()` TAIL，通过 `filterBlocks` + NBT 元数据定位标记
+- [X] 空气暴露检测（5 方向，排除平台底面/柱芯/屋顶外侧）
+- [X] 鞘翅翼后 100% 替换（船模板，通过 `filterBlocks` + 旋转计算定位）
+- [X] 分模板概率系统（从反射读取 `templateName` 字段）：
+  - bridge_end: 20% | fat_tower_top: 12% | third_floor_2: 10%
+  - ship: 8% | tower_top: 6% | base_floor / fat_tower_base: 5%
+  - second_floor_1/2 / fat_tower_middle: 4% | third_floor_1: 3%
+  - 屋顶/楼梯: 2% | 其余: 0%（塔基/桥段等结构方块不替换）
+- [X] 确定性随机（世界种子 + 方块坐标 XOR，无需 RNG 对象）
+- [X] Phase 2 延迟执行（`server.execute()` 避开区块生成期战利品表注入限制）
+- [X] 11 个自动化测试扩展（共 35 项测试，全部通过）
+
+> ⚠️ **重要经验**：末地城虽然是 Jigsaw 结构，但 `EndCityPiece` 继承 `TemplateStructurePiece`，使用 `StructureTemplate.placeInWorld()` 放置方块。`StructureProcessor` 添加到 `placeSettings` 会被覆盖/忽略，**必须用 Mixin 拦截 `postProcess` TAIL** 后进行后置扫描。
 
 ### 遗迹产出定义（已废弃 — 待重新设计）
 
@@ -130,7 +145,11 @@ if (be instanceof RelicBrushableBlockEntity relicBe) {
 | 7 | 喷泉房间中心 3×3 范围为 50% 替换，非 100% | ✅ 已验证 |
 | 8 | 储藏室仅替换裂纹/苔石砖（非普通石砖），中心地板 100% | ✅ 已验证 |
 | 9 | 自定义可疑方块有裂纹纹理，刷取时裂纹逐级扩散 | ✅ 已验证 |
-| 10 | 进入下界要塞，下界砖有概率被替换为可疑的下界砖 | ✅ 已验证（24/24 测试通过） |
+| 10 | 进入下界要塞，下界砖有概率被替换为可疑的下界砖 | ✅ 已验证 |
 | 11 | 可疑的下界砖刷取完成后掉落正确的下界主题物品 | ✅ 已验证 |
 | 12 | 熔岩井底浮空下界砖 100% 替换为可疑方块 | ✅ 已验证 |
 | 13 | 埋墙和支柱内部的下界砖不会被替换（空气暴露检测） | ✅ 已验证 |
+| 14 | 进入末地城，紫珀块有概率被替换为可疑的紫珀块 | ✅ 已验证（35/35 测试通过） |
+| 15 | 末地船鞘翅物品展示框背后的紫珀块 100% 替换为可疑方块 | ✅ 已验证 |
+| 16 | 埋墙/柱芯/屋顶外侧的紫珀块不会被替换（仅 5 方向空气暴露） | ✅ 已验证 |
+| 17 | 末地桥梁末端（bridge_end）替换率达 20%，屋顶/楼梯仅 2% | ✅ 已验证 |

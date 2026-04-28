@@ -1,6 +1,6 @@
 # RelicTales（考古物语）
 
-![Minecraft 1.21.4](https://img.shields.io/badge/Minecraft-1.21.4-brightgreen)
+![Minecraft 26.1.1](https://img.shields.io/badge/Minecraft-26.1.1-brightgreen)
 ![NeoForge 26.1.1.14-beta](https://img.shields.io/badge/NeoForge-26.1.1.14--beta-orange)
 ![Java 25](https://img.shields.io/badge/Java-25-blue)
 
@@ -21,6 +21,7 @@ RelicTales（考古物语）是一个以"原生增强"为核心理念的考古 M
 | 沙漠神殿 | 可疑的雕纹砂岩 | Mixin（Legacy 结构） |
 | 要塞 | 可疑的裂纹石砖/苔石砖/苔石 | Mixin（概率替换系统） |
 | 下界要塞 | 可疑的下界砖 | Mixin（空气暴露检测 + 概率替换） |
+| 末地城 | 可疑的紫珀块 | Mixin postProcess TAIL（Jigsaw → TemplateStructurePiece） |
 
 ### 智能概率系统（要塞）
 不同房间类型有不同的可疑方块生成概率：
@@ -34,6 +35,14 @@ RelicTales（考古物语）是一个以"原生增强"为核心理念的考古 M
 - **小走廊 / 转弯 / 桥**: 1% | **全覆盖兜底**: 0.2%
 - **熔岩井底**: 100%（特殊位置固定替换）
 - **空气暴露检测**: 仅替换至少有一面暴露在空气中的方块（排除埋墙和支柱内部）
+
+### 智能概率系统（末地城）
+- **桥梁末端**: 20% | **胖塔顶**: 12% | **第三层 2 号**: 10%
+- **末地船**: 8% | **塔顶**: 6% | **底层 / 胖塔底**: 5%
+- **第二层 / 胖塔中段**: 4% | **第三层 1 号**: 3%
+- **屋顶 / 楼梯**: 2% | **塔基 / 桥段 / 塔板**: 0%（保留结构完整性）
+- **鞘翅翼后**: 100%（末地船特殊位置固定替换）
+- **5 方向空气暴露检测**: 仅替换顶面或四面至少有一面暴露在空气中的方块，排除平台底面/柱芯/屋顶外侧
 
 ### 裂纹纹理自动生成
 自定义可疑方块的裂纹材质从原版可疑沙砾/沙子中提取裂纹遮罩，程序化叠加到基础方块纹理上。刷取时裂纹随 `dusted=N` 等级逐步扩散，与原版行为完全一致。
@@ -51,7 +60,7 @@ RelicTales（考古物语）是一个以"原生增强"为核心理念的考古 M
 | Milestone | 内容 | 状态 |
 |---|---|---|
 | M1 | 原型与基础注册 | ✅ 已完成 |
-| M2 | 遗迹注入机制（丛林神殿/沙漠神殿/要塞/下界要塞） | ✅ 已完成 |
+| M2 | 遗迹注入机制（丛林神殿/沙漠神殿/要塞/下界要塞/末地城） | ✅ 已完成 |
 | M3 | 内容物扩充 | 🔄 设计讨论中 |
 | M4 | 考古工具集 | ⏳ 待设计 |
 | M5 | MVP 发布验收 | ⏳ 待设计 |
@@ -61,14 +70,14 @@ RelicTales（考古物语）是一个以"原生增强"为核心理念的考古 M
 ```bash
 ./gradlew build               # 完整构建
 ./gradlew runClient           # 运行测试客户端
-./gradlew runGameTestServer   # 运行自动化游戏测试（19 个测试）
+./gradlew runGameTestServer   # 运行自动化游戏测试（35 个测试）
 ./gradlew runData             # 运行数据生成器（BlockStates / LootTables / Lang）
 ./gradlew clean build         # 清理并重新构建
 ```
 
 ## 系统要求
 
-- Minecraft: 1.21.4
+- Minecraft: 26.1.1
 - NeoForge: 26.1.1.14-beta
 - Java: 25（Foojay resolver 自动管理，无需手动配置）
 
@@ -93,6 +102,7 @@ src/main/java/com/relictales/
 │   ├── MixinJungleTemplePiece.java   # 丛林神殿注入
 │   ├── MixinDesertPyramidPiece.java  # 沙漠神殿注入
 │   ├── MixinChestCorridor.java       # 要塞走廊安全网
+│   ├── MixinEndCityProcessor.java    # 末地城方块注入（postProcess TAIL）
 │   ├── StructurePieceInvoker.java    # 访问 StructurePiece 内部方法
 │   └── RoomCrossingAccessor.java     # 访问 RoomCrossing.type 字段
 │
@@ -105,7 +115,7 @@ src/main/java/com/relictales/
 │   ├── RelicLootTables.java
 │   └── RelicLang.java
 │
-└── test/                        # 游戏测试（24 个）
+└── test/                        # 游戏测试（35 个）
     └── RelicBrushInteractionTest.java
 ```
 
